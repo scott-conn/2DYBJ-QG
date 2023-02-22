@@ -18,8 +18,6 @@ import numpy as np
 import dedalus.public as de
 from dedalus.extras import flow_tools
 import scipy.fft as spfft
-from IPython import display
-import random
 from matplotlib import pyplot as plt
 import time
 import logging
