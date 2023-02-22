@@ -59,7 +59,7 @@ def run_sim(Ls,ns,p,init_file):
   t_eddy = 1/U_e/k_eddy
   lambda_0 = N0/f0/m0
   hf = h5py.File(init_file, 'r')
-  F = hf.get('F')[0]
+  F = hf.get('F')[:]
 
   #add parameters to problem
   problem.parameters['kappa'] = kappa
@@ -67,7 +67,7 @@ def run_sim(Ls,ns,p,init_file):
   problem.parameters['f0'] = f0
   problem.parameters['lambda'] = lambda_0
   problem.parameters['eta'] = f0*lambda_0**2
-  problem.parameters['F'] = F
+  problem.parameters['F'] = F[0]
   
   #define shorthands for various differential operators, magnitude of a complex number and the wave-induced PV
   problem.substitutions["mag2(f)"] = "f * conj(f)"
