@@ -127,6 +127,7 @@ def run_sim(Ls,ns,p,init_file):
           logger.info('Iteration: %i, Time: %e, dt: %e' %(solver.iteration, solver.sim_time, dt))
 
   end_time = time.time()
+  hf.close()
 
   display.clear_output()
   # Print statistics
