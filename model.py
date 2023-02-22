@@ -41,9 +41,11 @@ def run_sim(Ls,ns,p,init_file):
   x_basis = de.Fourier('x', nx, interval=(-Lx/2, Lx/2), dealias=3/2)        
   y_basis = de.Fourier('y', ny, interval=(-Ly/2, Ly/2), dealias=3/2)    
 
+  #add x and y to a domain and then define an IVP with variables q, ψ and φ
   domain = de.Domain([x_basis, y_basis], grid_dtype=np.complex128)
   problem = de.IVP(domain, variables=['q','psi','phi'])
   
+  #problem parameters
   kappa = p[1]
   nu = p[2]
   f0 = p[3]
@@ -59,6 +61,7 @@ def run_sim(Ls,ns,p,init_file):
   hf = h5py.File(init_file, 'r')
   F = hf.get('F')[0]
 
+  #add parameters to problem
   problem.parameters['kappa'] = kappa
   problem.parameters['nu'] = nu
   problem.parameters['f0'] = f0
@@ -67,23 +70,28 @@ def run_sim(Ls,ns,p,init_file):
   problem.parameters['uw'] = U_w
   problem.parameters['F'] = 
   
+  #define shorthands for various differential operators, magnitude of a complex number and the wave-induced PV
   problem.substitutions["mag2(f)"] = "f * conj(f)"
   problem.substitutions["J(f,g)"] = "dx(f)*dy(g)-dy(f)*dx(g)"
   problem.substitutions["L(f)"] = "d(f,x=2) + d(f,y=2)"
   problem.substitutions["HD(f)"] = "L(L(L(L(a))))"
   problem.substitutions["qw"] = "L(mag2(phi))/4/f0 + 1j*J(conj(phi),phi)/2/f0"
   
+  #add model equations (note that for the k=l=0 mode we have a degeneracy which we remove by setting the gauge on ψ)
   problem.add_equation("dt(q)+kappa*HD(q)=-J(psi,q)")
   problem.add_equation("dt(phi) - 1j*eta*L(phi)/2 = -J(psi,phi) - 1j*phi*L(psi)/2 + F ")
   problem.add_equation("q-L(psi) = qw", condition="(nx != 0) or (ny != 0)")
   problem.add_equation("psi = 0.0 ", condition="(nx == 0) and (ny == 0)")
   
+  #build solver
   solver = problem.build_solver('RK222')
   
+  #specify simulation time
   solver.stop_sim_time = Nt*t_eddy
   solver.stop_wall_time = np.inf
   solver.stop_iteration = np.inf
   
+  #read ψ and φ from the input file
   psi = solver.state['psi']
   slices = domain.dist.grid_layout.slices(scales=1)                                           
   psi_data = hf.get('psi')                                                                   
@@ -95,21 +103,24 @@ def run_sim(Ls,ns,p,init_file):
   phi['g'] = phi_data[slices]
   hf.close()
   
+  #use small timestep to force dedalus to calculate q from the initial ψ (there is probably a better way to do this)
   dt = 1e-10
   solver.step(dt)
   
-  dt = time_step*t_eddy
-  
+  #tell dedalus what to store in the output
   state_file = "state" #output file name
   analysis = solver.evaluator.add_file_handler(state_file, iter=Nw)
   analysis.add_system(solver.state, layout='g')
-  analysis.add_task('W',name='wind')
   analysis.add_task('L(psi)',name='zeta')
+  analysis.add_task('qw',name='qw')
 
+  #solve IVP
+  dt = time_step*t_eddy
   logger.info('Starting loop')
   start_time = time.time()
   while solver.ok:
       solver.step(dt)
+      #update forcing
       problem.namespace['F'].value = F[solver.iteration]
       if solver.iteration % 100 == 0:
           # Update plot of scalar field
@@ -123,6 +134,6 @@ def run_sim(Ls,ns,p,init_file):
   logger.info('Run time: %f' %(end_time-start_time))
   logger.info('Iterations: %i' %solver.iteration)
 
-  #cleanup output files
+  #cleanup output file
   from dedalus.tools import post
   post.merge_process_files(state_file, cleanup=True)
