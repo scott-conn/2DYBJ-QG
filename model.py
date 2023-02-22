@@ -67,7 +67,6 @@ def run_sim(Ls,ns,p,init_file):
   problem.parameters['f0'] = f0
   problem.parameters['lambda'] = lambda_0
   problem.parameters['eta'] = f0*lambda_0**2
-  problem.parameters['uw'] = U_w
   problem.parameters['F'] = F
   
   #define shorthands for various differential operators, magnitude of a complex number and the wave-induced PV
