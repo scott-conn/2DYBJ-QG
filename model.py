@@ -46,16 +46,16 @@ def run_sim(Ls,ns,p,init_file):
   problem = de.IVP(domain, variables=['q','psi','phi'])
   
   #problem parameters
-  kappa = p[1]
-  nu = p[2]
-  f0 = p[3]
-  N0 = p[4]
-  m0 = p[5]
-  k_eddy = p[6]
-  U_e = p[7]
-  Nt = p[8]
-  Nw = p[9]
-  time_step = p[10]
+  kappa = p[0]
+  nu = p[1]
+  f0 = p[2]
+  N0 = p[3]
+  m0 = p[4]
+  k_eddy = p[5]
+  U_e = p[6]
+  Nt = p[7]
+  Nw = p[8]
+  time_step = p[9]
   t_eddy = 1/U_e/k_eddy
   lambda_0 = N0/f0/m0
   hf = h5py.File(init_file, 'r')
@@ -66,9 +66,9 @@ def run_sim(Ls,ns,p,init_file):
   problem.parameters['nu'] = nu
   problem.parameters['f0'] = f0
   problem.parameters['lambda'] = lambda_0
-  problem.parameters['eta'] = f_0*lambda_0**2
+  problem.parameters['eta'] = f0*lambda_0**2
   problem.parameters['uw'] = U_w
-  problem.parameters['F'] = 
+  problem.parameters['F'] = F
   
   #define shorthands for various differential operators, magnitude of a complex number and the wave-induced PV
   problem.substitutions["mag2(f)"] = "f * conj(f)"
