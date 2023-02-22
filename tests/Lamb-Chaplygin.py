@@ -1,4 +1,4 @@
-from model import *
+from ../model import *
 import numpy as np
 
 N = 512
