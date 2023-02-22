@@ -73,7 +73,7 @@ def run_sim(Ls,ns,p,init_file):
   problem.substitutions["mag2(f)"] = "f * conj(f)"
   problem.substitutions["J(f,g)"] = "dx(f)*dy(g)-dy(f)*dx(g)"
   problem.substitutions["L(f)"] = "d(f,x=2) + d(f,y=2)"
-  problem.substitutions["HD(f)"] = "L(L(L(L(a))))"
+  problem.substitutions["HD(f)"] = "L(L(L(L(f))))"
   problem.substitutions["qw"] = "L(mag2(phi))/4/f0 + 1j*J(conj(phi),phi)/2/f0"
   
   #add model equations (note that for the k=l=0 mode we have a degeneracy which we remove by setting the gauge on ψ)
