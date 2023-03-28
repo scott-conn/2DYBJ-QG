@@ -90,19 +90,29 @@ def run_sim(Ls,ns,p,init_file):
   
   #read ψ and φ from the input file
   psi = solver.state['psi']
+  psi.set_scales(1)
   slices = domain.dist.grid_layout.slices(scales=1)                                           
   psi_data = hf.get('psi')                                                                   
   psi['g'] = psi_data[slices]
   
   phi = solver.state['phi']
+  phi.set_scales(1)
   slices = domain.dist.grid_layout.slices(scales=1)                                           
   phi_data = hf.get('phi')                                                                   
   phi['g'] = phi_data[slices]
   hf.close()
-  
-  #use small timestep to force dedalus to calculate q from the initial ψ (there is probably a better way to do this)
-  dt = 1e-10
-  solver.step(dt)
+
+  #calculate qw and L(phi) to get q
+  qw1 = ((np.conj(phi)*phi).evaluate().differentiate(x=2,y=2)/4/f0).evaluate()
+  qw2 = (1j*((np.conj(phi).evaluate()).differentiate(x=1)*phi.differentiate(y=1) - 
+             (np.conj(phi).evaluate().differentiate(y=1)*phi.differentiate(x=1))/2/f0)).evaluate()
+  qw = (qw1 + qw2).evaluate()
+  L = (psi.differentiate(x=2) + psi.differentiate(y=2)).evaluate()
+  qw.set_scales(1)
+  L.set_scales(1)
+  q = solver.state['q']
+  q.set_scales(1)
+  q['g'] = L['g'] + qw['g']  
   
   #tell dedalus what to store in the output
   state_file = "state" #output file name
