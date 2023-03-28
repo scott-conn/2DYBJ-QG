@@ -75,9 +75,9 @@ def run_sim(Ls,ns,p,init_file):
   problem.substitutions["qw"] = "L(mag2(phi))/4/f0 + 1j*J(conj(phi),phi)/2/f0"
   
   #add model equations (note that for the k=l=0 mode we have a degeneracy which we remove by setting the gauge on ψ)
-  problem.add_equation("dt(q)+kappa*HD(q)=-J(psi,q)")
-  problem.add_equation("dt(phi) - 1j*eta*L(phi)/2 = -J(psi,phi) - 1j*phi*L(psi)/2 + F ")
-  problem.add_equation("q-L(psi) = qw", condition="(nx != 0) or (ny != 0)")
+  problem.add_equation("dt(q) + kappa*HD(q) = -J(psi,q)")
+  problem.add_equation("dt(phi) - 1j*eta*L(phi)/2 + nu*HD(phi) = -J(psi,phi) - 1j*phi*L(psi)/2 + F ")
+  problem.add_equation("q - L(psi) = qw", condition="(nx != 0) or (ny != 0)")
   problem.add_equation("psi = 0.0 ", condition="(nx == 0) and (ny == 0)")
   
   #build solver
