@@ -16,6 +16,18 @@ We use dedalus to solve these equations on a periodic domain.
 
 The test file contains code to run the two examples from [[4]](#4).
 
+## Animation of Lamb-Chaplygin Dipole
+<div align="center">
+
+https://user-images.githubusercontent.com/71698037/228623004-b4941811-33de-4ae5-a1f6-512b285d8c4b.mp4
+
+<div/>
+
+(cf. [[4]](#4) Figure 1.)
+
+
+
+
 ## References
 <a id="1">[1]</a> 
 Young, W. R., Ben Jelloul, M. (1997).
